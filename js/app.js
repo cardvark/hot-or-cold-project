@@ -26,7 +26,9 @@ $(document).ready(function(){
 		var guessNum = $('#userGuess').val();
 		guessNum = parseInt(guessNum);
 
-		if (guessNum) {
+		if (winStatus != true) {
+			alert("Start a new game!");
+		} else if (guessNum) {
 			guessArray.push(guessNum);
 			currentCount +=1;
 			playerGuess(guessArray, currentCount);
@@ -41,6 +43,8 @@ $(document).ready(function(){
 });
 
 var DEBUG_MODE = true;
+
+var winStatus = true;
 
 var debug = function(msg) {
     if (DEBUG_MODE == true) {
@@ -60,6 +64,9 @@ var newGame = function(){
 	currentCount = 0;
 	countUpdate(currentCount);
 	guessArray = [];
+	winStatus = true;
+	feedbackUpdate("Make your Guess!");
+
 	$('#guessList').empty();
 	finalNum = randNum(1, 100);
 	debug(finalNum);
@@ -72,7 +79,8 @@ var playerGuess = function(guessArray, currentCount) {
 	var guessNum = guessArray.slice(-1)[0];
 
 	if (guessNum == finalNum) {
-		// need to think about how to finish the guessing game.
+		feedbackUpdate("You won in " + currentCount + ((currentCount == 1) ? " try! Start another game?" : " tries! Start another game?" ));
+		winStatus = false;
 	}
 
 	if (currentCount == 1) {
@@ -83,9 +91,6 @@ var playerGuess = function(guessArray, currentCount) {
 }
 
 function firstComparison(guessNum, rightNum) {
-	debug("current count is " + currentCount);
-	debug(guessNum + ", " + rightNum);
-
 	rightDiff = Math.abs(guessNum - rightNum);
 
 	var hotMax = 10;
@@ -104,6 +109,10 @@ var pageUpdate = function(currentCount, guessNum) {
 
 function countUpdate(newCount) {
   	$("#count").html(newCount);
+}
+
+function feedbackUpdate(newText) {
+	$("#feedback").html(newText);
 }
 
 function randNum(minNum, maxNum) {
