@@ -42,7 +42,7 @@ $(document).ready(function(){
 
 });
 
-var absComp = true;
+var absComp = false;
 
 var DEBUG_MODE = true;
 
@@ -85,9 +85,7 @@ var playerGuess = function(guessArray, currentCount) {
 	if (guessNum == finalNum) {
 		feedbackUpdate("Correct, it was " + finalNum + "! You won in " + currentCount + ((currentCount == 1) ? " try. Start another game?" : " tries. Start another game?" ));
 		winStatus = false;
-	}
-
-	if ((currentCount == 1 || absComp) && winStatus) {
+	} else if ((currentCount == 1 || absComp) && winStatus) {
 		firstComparison(guessNum, finalNum);
 	} else {
 		nextComparison(guessNum, guessArray.slice(-2)[0],finalNum);
@@ -139,9 +137,9 @@ tempArray = [
 
 function binaryLowestGreater(array, low, high, num) {
 	var mid = Math.floor((low + high) / 2);
-
+/*
 	console.log(low, high, num, mid, array);
-
+*/
 	if (low == high) {
 		return array[low];
 	}
@@ -156,8 +154,6 @@ function binaryLowestGreater(array, low, high, num) {
 function firstComparison(guessNum, rightNum) {
 	rightDiff = Math.abs(guessNum - rightNum);
 	debug(rightDiff);
-
-	// need to finish this.  would prefer not to just do if statements.
 
 	feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length, rightDiff)]);
 
@@ -175,7 +171,21 @@ function firstComparison(guessNum, rightNum) {
 }
 
 function nextComparison(guessNum, lastNum, rightNum) {
+	var rightDiff = Math.abs(guessNum - rightNum);
+	var oldDiff = Math.abs(lastNum - rightNum);
 
+	debug(rightDiff + ", " + oldDiff);
+	debug("on next comparison");
+
+	if (oldDiff >= Object.keys(temperatureDict)[0]) {
+		feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length, rightDiff)]);
+	} else {
+		if (rightDiff < oldDiff) {
+			feedbackUpdate("Warmer!");
+		} else {
+			feedbackUpdate("Getting colder!");
+		}
+	}
 }
 
 var pageUpdate = function(currentCount, guessNum) {
