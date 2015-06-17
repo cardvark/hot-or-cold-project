@@ -42,7 +42,7 @@ $(document).ready(function(){
 
 });
 
-var absComp = false;
+var absComp = true;
 
 var DEBUG_MODE = true;
 
@@ -51,10 +51,6 @@ var winStatus = true;
 var minNum = 1;
 var maxNum = 100;
 
-var vhotMax = 10;
-var hotMax = 20;
-var warmMax = 30;
-var coldMax = 50;
 
 var debug = function(msg) {
     if (DEBUG_MODE == true) {
@@ -98,13 +94,74 @@ var playerGuess = function(guessArray, currentCount) {
 	}
 }
 
+var temperatureDict = {
+	10: "You're VERY hot!",
+	20: "You're hot!",
+	30: "You're pretty warm.",
+	50: "You're cold.",
+	100: "You're freezing cold!"
+}
+
+var temperatureKeys = Object.keys(temperatureDict).map(function(item){
+	return parseInt(item);
+}).sort(function(a, b){return a-b});
+
+var vhotMax = 10;
+var hotMax = 20;
+var warmMax = 30;
+var coldMax = 50;
+
+tempArray = [
+	2,
+	3,
+	5,
+	7,
+	11,
+	13,
+	17,
+	19,
+	23,
+	29,
+	31,
+	37,
+	41,
+	43,
+	47,
+	53,
+	59,
+	61,
+	67,
+	71
+];
+
+// low starts at 0, high starts at array.length, num is the target.
+// i spent an embarrassingly lengthy amount of time working on this tangent.
+
+function binaryLowestGreater(array, low, high, num) {
+	var mid = Math.floor((low + high) / 2);
+
+	console.log(low, high, num, mid, array);
+
+	if (low == high) {
+		return array[low];
+	}
+
+	if (array[mid] < num) {
+		return binaryLowestGreater(array, mid + 1, high, num);
+	} else {
+		return binaryLowestGreater(array, low, mid, num);
+	}
+}
+
 function firstComparison(guessNum, rightNum) {
 	rightDiff = Math.abs(guessNum - rightNum);
 	debug(rightDiff);
 
 	// need to finish this.  would prefer not to just do if statements.
 
-	if (rightDiff > 0 && rightDiff <= vhotMax) {
+	feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length, rightDiff)]);
+
+/*	if (rightDiff > 0 && rightDiff <= vhotMax) {
 		feedbackUpdate("You're VERY Hot!");
 	} else if (rightDiff > vhotMax && rightDiff <= hotMax) {
 		feedbackUpdate("You're hot!"); 
@@ -114,7 +171,7 @@ function firstComparison(guessNum, rightNum) {
 		feedbackUpdate("You're cold.");
 	} else {
 		feedbackUpdate("You're very cold!");
-	}
+	}*/
 }
 
 function nextComparison(guessNum, lastNum, rightNum) {
