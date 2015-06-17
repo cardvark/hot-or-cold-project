@@ -34,7 +34,7 @@ $(document).ready(function(){
 			playerGuess(guessArray, currentCount);
 			pageUpdate(currentCount, guessNum);
 		} else {
-			alert("Need to input a number");
+			alert("Need to input a number between " + minNum + " and" + maxNum);
 		}
 
 		document.getElementById('userGuess').value = "";  		
@@ -42,9 +42,19 @@ $(document).ready(function(){
 
 });
 
+var absComp = false;
+
 var DEBUG_MODE = true;
 
 var winStatus = true;
+
+var minNum = 1;
+var maxNum = 100;
+
+var vhotMax = 10;
+var hotMax = 20;
+var warmMax = 30;
+var coldMax = 50;
 
 var debug = function(msg) {
     if (DEBUG_MODE == true) {
@@ -52,7 +62,7 @@ var debug = function(msg) {
     }
 }
 
-var finalNum = randNum(1, 100);
+var finalNum = randNum(minNum, maxNum);
 debug(finalNum);
 
 var currentCount = 0;
@@ -74,33 +84,42 @@ var newGame = function(){
 };
 
 var playerGuess = function(guessArray, currentCount) {
-	debug("player guessed: " + guessArray.slice(-1)[0]);
-
 	var guessNum = guessArray.slice(-1)[0];
 
 	if (guessNum == finalNum) {
-		feedbackUpdate("You won in " + currentCount + ((currentCount == 1) ? " try! Start another game?" : " tries! Start another game?" ));
+		feedbackUpdate("Correct, it was " + finalNum + "! You won in " + currentCount + ((currentCount == 1) ? " try. Start another game?" : " tries. Start another game?" ));
 		winStatus = false;
 	}
 
-	if (currentCount == 1) {
-		firstComparison(guessArray.slice(-1)[0], finalNum);
+	if ((currentCount == 1 || absComp) && winStatus) {
+		firstComparison(guessNum, finalNum);
 	} else {
-		 
+		nextComparison(guessNum, guessArray.slice(-2)[0],finalNum);
 	}
 }
 
 function firstComparison(guessNum, rightNum) {
 	rightDiff = Math.abs(guessNum - rightNum);
-
-	var hotMax = 10;
-	var warmMax = 20;
-	var coolMax = 40;
+	debug(rightDiff);
 
 	// need to finish this.  would prefer not to just do if statements.
 
+	if (rightDiff > 0 && rightDiff <= vhotMax) {
+		feedbackUpdate("You're VERY Hot!");
+	} else if (rightDiff > vhotMax && rightDiff <= hotMax) {
+		feedbackUpdate("You're hot!"); 
+	} else if (rightDiff > hotMax && rightDiff <= warmMax) {
+		feedbackUpdate("You're pretty warm!");
+	} else if (rightDiff > warmMax && rightDiff <= coldMax) {
+		feedbackUpdate("You're cold.");
+	} else {
+		feedbackUpdate("You're very cold!");
+	}
 }
 
+function nextComparison(guessNum, lastNum, rightNum) {
+
+}
 
 var pageUpdate = function(currentCount, guessNum) {
 	$('#guessList').append('<li>' + guessNum + '</li>');
