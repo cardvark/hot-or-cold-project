@@ -69,12 +69,33 @@ var newGame = function(){
 var playerGuess = function(guessArray, currentCount) {
 	debug("player guessed: " + guessArray.slice(-1)[0]);
 
+	var guessNum = guessArray.slice(-1)[0];
+
+	if (guessNum == finalNum) {
+		// need to think about how to finish the guessing game.
+	}
+
 	if (currentCount == 1) {
-
+		firstComparison(guessArray.slice(-1)[0], finalNum);
 	} else {
-
+		 
 	}
 }
+
+function firstComparison(guessNum, rightNum) {
+	debug("current count is " + currentCount);
+	debug(guessNum + ", " + rightNum);
+
+	rightDiff = Math.abs(guessNum - rightNum);
+
+	var hotMax = 10;
+	var warmMax = 20;
+	var coolMax = 40;
+
+	// need to finish this.  would prefer not to just do if statements.
+
+}
+
 
 var pageUpdate = function(currentCount, guessNum) {
 	$('#guessList').append('<li>' + guessNum + '</li>');
