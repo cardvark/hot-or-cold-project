@@ -28,6 +28,8 @@ $(document).ready(function(){
 
 		if (winStatus != true) {
 			alert("Start a new game!");
+		} else if (guessArray.indexOf(guessNum) >= 0) {
+			alert("You already guessed that!");
 		} else if (guessNum) {
 			guessArray.push(guessNum);
 			currentCount +=1;
@@ -135,19 +137,41 @@ tempArray = [
 // low starts at 0, high starts at array.length, num is the target.
 // i spent an embarrassingly lengthy amount of time working on this tangent.
 
-function binaryLowestGreater(array, low, high, num) {
-	var mid = Math.floor((low + high) / 2);
-/*
-	console.log(low, high, num, mid, array);
-*/
-	if (low == high) {
-		return array[low];
-	}
+// test the "high" value input - currently as length, probably should be highest index, which is length - 1.
+// test inputting value above max values in the array, below min as well.
 
+function binaryLowestGreater(array, iMin, iMax, num) {
+	// note that this method will always return a value, even if you go above or below the array range.
+
+	// Create midpoint index number. This will be the primary comparison point.
+	var mid = Math.floor((iMin + iMax) / 2);
+
+	//console.log("iMin, iMax, num, mid, array: ", iMin, iMax, num, array[mid], array.slice(iMin, iMax + 1));
+	console.log(iMin, iMax, num);
+	debug("Mid num: " + array[mid]);
+	debug(array.slice(iMin, iMax + 1));
+	debug("Break");
+
+	// this allows us to stop when done, and thus find the lowest greater than value.
+	if (iMin == iMax) {
+		// index values are equal - found our match.
+		return array[iMin];
+	} 
+
+	// this one works if you want to find perfect matches.
+/*	if (iMin > iMax) {
+		return "not found";
+	}
+*/
 	if (array[mid] < num) {
-		return binaryLowestGreater(array, mid + 1, high, num);
+		// midpoint num is less than the target - check top half.
+		return binaryLowestGreater(array, mid + 1, iMax, num);
+	} else if (array[mid] == num) {
+		// found a perfect match.
+		return array[mid];
 	} else {
-		return binaryLowestGreater(array, low, mid, num);
+		// midpoint num is greater than the target.  Check bottom half.
+		return binaryLowestGreater(array, iMin, mid - 1, num);
 	}
 }
 
@@ -155,7 +179,7 @@ function firstComparison(guessNum, rightNum) {
 	rightDiff = Math.abs(guessNum - rightNum);
 	debug(rightDiff);
 
-	feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length, rightDiff)]);
+	feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length - 1, rightDiff)]);
 
 /*	if (rightDiff > 0 && rightDiff <= vhotMax) {
 		feedbackUpdate("You're VERY Hot!");
@@ -178,10 +202,12 @@ function nextComparison(guessNum, lastNum, rightNum) {
 	debug("on next comparison");
 
 	if (oldDiff >= Object.keys(temperatureDict)[0]) {
-		feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length, rightDiff)]);
+		feedbackUpdate(temperatureDict[binaryLowestGreater(temperatureKeys, 0, temperatureKeys.length - 1, rightDiff)]);
 	} else {
 		if (rightDiff < oldDiff) {
-			feedbackUpdate("Warmer!");
+			feedbackUpdate("Hotter!");
+		} else if (rightDiff == oldDiff) {
+			feedbackUpdate("Still hot!");
 		} else {
 			feedbackUpdate("Getting colder!");
 		}
